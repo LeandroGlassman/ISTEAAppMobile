@@ -1,49 +1,70 @@
-import React from "react";
-import { Button, StyleSheet, Text, View } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import React, { useState } from "react";
+import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity } from "react-native";
 import { useAuth } from "../context/AuthContext";
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../navigation/AppNavigator";
 
-type Nav = NativeStackNavigationProp<RootStackParamList, "Login">;
+type Props = NativeStackScreenProps<RootStackParamList, "Login">;
 
-export default function LoginScreen() {
-  const navigation = useNavigation<Nav>();
-  const { register, login } = useAuth();
+export default function LoginScreen({ navigation }: Props) {
+  const { login } = useAuth();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleForceLogin = async () => {
-    const exists = await login("debug", "debug123");
-    if (!exists.ok) {
-      await register("debug", "debug123");
-      await login("debug", "debug123");
+  const handleLogin = async () => {
+    if (!username.trim() || !password) {
+      Alert.alert("Error", "Completá usuario y contraseña");
+      return;
+    }
+    setSubmitting(true);
+    const result = await login(username, password);
+    setSubmitting(false);
+    if (!result.ok) {
+      Alert.alert("Error", result.error ?? "No se pudo iniciar sesión");
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
-      <View style={styles.spacer} />
-      <Button title="Ir a Register" onPress={() => navigation.navigate("Register")} />
-      <View style={styles.spacer} />
-      <Button title="Forzar login" onPress={handleForceLogin} />
+      <Text style={styles.title}>Iniciar sesión</Text>
+
+      <TextInput
+        style={styles.input}
+        placeholder="Usuario"
+        value={username}
+        onChangeText={setUsername}
+        autoCapitalize="none"
+      />
+
+      <TextInput
+        style={styles.input}
+        placeholder="Contraseña"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+      />
+
+      <Button title={submitting ? "Ingresando..." : "Ingresar"} onPress={handleLogin} disabled={submitting} />
+
+      <TouchableOpacity onPress={() => navigation.navigate("Register")} style={styles.linkContainer}>
+        <Text style={styles.link}>¿No tenés cuenta? Registrate</Text>
+      </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 20,
+  container: { flex: 1, justifyContent: "center", padding: 20 },
+  title: { fontSize: 28, fontWeight: "bold", marginBottom: 24, textAlign: "center" },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    padding: 12,
+    marginBottom: 12,
+    borderRadius: 8,
+    fontSize: 16,
   },
-  title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    marginBottom: 16,
-  },
-  spacer: {
-    height: 12,
-  },
+  linkContainer: { marginTop: 16, alignItems: "center" },
+  link: { color: "#007aff", fontSize: 14 },
 });

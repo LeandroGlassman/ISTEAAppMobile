@@ -1,37 +1,74 @@
-import React from "react";
-import { Button, StyleSheet, Text, View } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import React, { useState } from "react";
+import { View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
+import { useAuth } from "../context/AuthContext";
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../navigation/AppNavigator";
 
-type Nav = NativeStackNavigationProp<RootStackParamList, "Register">;
+type Props = NativeStackScreenProps<RootStackParamList, "Register">;
 
-export default function RegisterScreen() {
-  const navigation = useNavigation<Nav>();
+export default function RegisterScreen({ navigation }: Props) {
+  const { register } = useAuth();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [password2, setPassword2] = useState("");
+
+  const handleRegister = async () => {
+    if (password !== password2) {
+      Alert.alert("Error", "Las contraseñas no coinciden");
+      return;
+    }
+    const result = await register(username, password);
+    if (!result.ok) {
+      Alert.alert("Error", result.error ?? "No se pudo registrar");
+      return;
+    }
+    Alert.alert("Listo", "Usuario registrado. Ahora podés iniciar sesión.", [
+      { text: "OK", onPress: () => navigation.goBack() },
+    ]);
+  };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Register</Text>
-      <View style={styles.spacer} />
-      <Button title="Volver" onPress={() => navigation.goBack()} />
+      <Text style={styles.title}>Crear cuenta</Text>
+
+      <TextInput
+        style={styles.input}
+        placeholder="Usuario"
+        value={username}
+        onChangeText={setUsername}
+        autoCapitalize="none"
+      />
+
+      <TextInput
+        style={styles.input}
+        placeholder="Contraseña (mínimo 6)"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+      />
+
+      <TextInput
+        style={styles.input}
+        placeholder="Repetir contraseña"
+        value={password2}
+        onChangeText={setPassword2}
+        secureTextEntry
+      />
+
+      <Button title="Registrarme" onPress={handleRegister} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 20,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    marginBottom: 16,
-  },
-  spacer: {
-    height: 12,
+  container: { flex: 1, justifyContent: "center", padding: 20 },
+  title: { fontSize: 28, fontWeight: "bold", marginBottom: 24, textAlign: "center" },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    padding: 12,
+    marginBottom: 12,
+    borderRadius: 8,
+    fontSize: 16,
   },
 });
