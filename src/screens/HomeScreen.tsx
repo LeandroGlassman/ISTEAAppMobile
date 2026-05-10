@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { useAuth } from "../context/AuthContext";
 import { useItems } from "../hooks/useItems";
+import { useNotifications } from "../hooks/useNotifications";
 import ItemCard from "../components/ItemCard";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../navigation/AppNavigator";
@@ -22,6 +23,7 @@ const AUTO_DELETE_MS = 2000;
 export default function HomeScreen({ navigation }: Props) {
   const { currentUser, logout } = useAuth();
   const { tasks, loading, addTask, toggleTask, deleteTask } = useItems();
+  const { scheduleNotification } = useNotifications();
   const pendingDeletions = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
 
   const scheduleDeletion = (id: string) => {
@@ -109,6 +111,17 @@ export default function HomeScreen({ navigation }: Props) {
         <Button
           title="Tarea de prueba"
           onPress={() => addTask({ title: "Test " + Date.now(), notes: "" })}
+        />
+        <View style={{ height: 8 }} />
+        <Button
+          title="Probar notif 30s"
+          onPress={() =>
+            scheduleNotification(
+              "Test",
+              "Esto se disparó",
+              new Date(Date.now() + 30000)
+            )
+          }
         />
       </View>
 
