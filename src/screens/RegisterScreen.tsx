@@ -55,7 +55,7 @@ export default function RegisterScreen({ navigation }: Props) {
         secureTextEntry
       />
 
-      <Button title="Registrarme" onPress={handleRegister} />
+      <Button title="Registrarme" onPress={handleRegister} color="#2A9D8F" />
     </View>
   );
 }

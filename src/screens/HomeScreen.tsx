@@ -7,11 +7,11 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Alert,
-  Button,
+  Image,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "../context/AuthContext";
-import { useItems } from "../hooks/useItems";
-import { useNotifications } from "../hooks/useNotifications";
+import { useTasks } from "../context/TasksContext";
 import ItemCard from "../components/ItemCard";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../navigation/AppNavigator";
@@ -22,8 +22,8 @@ const AUTO_DELETE_MS = 2000;
 
 export default function HomeScreen({ navigation }: Props) {
   const { currentUser, logout } = useAuth();
-  const { tasks, loading, addTask, toggleTask, deleteTask } = useItems();
-  const { scheduleNotification } = useNotifications();
+  const { tasks, loading, toggleTask, deleteTask } = useTasks();
+  const insets = useSafeAreaInsets();
   const pendingDeletions = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
 
   const scheduleDeletion = (id: string) => {
@@ -85,16 +85,6 @@ export default function HomeScreen({ navigation }: Props) {
     };
   }, []);
 
-  React.useLayoutEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <TouchableOpacity onPress={logout}>
-          <Text style={styles.logoutText}>Salir</Text>
-        </TouchableOpacity>
-      ),
-    });
-  }, [navigation, logout]);
-
   if (loading) {
     return (
       <View style={styles.center}>
@@ -105,79 +95,98 @@ export default function HomeScreen({ navigation }: Props) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.welcome}>Hola, {currentUser} 👋</Text>
+      <View style={styles.content}>
+        <Text style={styles.welcome}>Hola, {currentUser} 👋</Text>
 
-      <View style={styles.debugBox}>
-        <Button
-          title="Tarea de prueba"
-          onPress={() => addTask({ title: "Test " + Date.now(), notes: "" })}
-        />
-        <View style={{ height: 8 }} />
-        <Button
-          title="Probar notif 30s"
-          onPress={() =>
-            scheduleNotification(
-              "Test",
-              "Esto se disparó",
-              new Date(Date.now() + 30000)
-            )
-          }
-        />
+        {tasks.length === 0 ? (
+          <View style={styles.empty}>
+            <Image
+              source={require("../../assets/empty-state.png")}
+              style={styles.emptyImage}
+              resizeMode="contain"
+            />
+          </View>
+        ) : (
+          <FlatList
+            data={tasks}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <ItemCard
+                task={item}
+                onToggle={handleToggle}
+                onDelete={handleDelete}
+                fadeDurationMs={AUTO_DELETE_MS}
+              />
+            )}
+            contentContainerStyle={{ paddingVertical: 12 }}
+          />
+        )}
       </View>
 
-      {tasks.length === 0 ? (
-        <View style={styles.empty}>
-          <Text style={styles.emptyText}>No hay tareas todavía</Text>
-          <Text style={styles.emptySub}>Tocá "+ Nueva" para crear una</Text>
-        </View>
-      ) : (
-        <FlatList
-          data={tasks}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <ItemCard
-              task={item}
-              onToggle={handleToggle}
-              onDelete={handleDelete}
-              fadeDurationMs={AUTO_DELETE_MS}
-            />
-          )}
-          contentContainerStyle={{ paddingVertical: 12 }}
-        />
-      )}
-
-      <TouchableOpacity
-        style={styles.fab}
-        onPress={() => navigation.navigate("AddItem")}
-      >
-        <Text style={styles.fabText}>+ Nueva</Text>
-      </TouchableOpacity>
+      <View style={[styles.bottomBar, { paddingBottom: 12 + insets.bottom }]}>
+        <View style={styles.bottomSlot} />
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() => navigation.navigate("AddItem")}
+          accessibilityLabel="Nueva tarea"
+        >
+          <Text style={styles.addButtonText}>+</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.bottomSlot, styles.bottomSlotRight]}
+          onPress={logout}
+          accessibilityLabel="Cerrar sesión"
+        >
+          <Text style={styles.bottomSlotText}>Salir</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, backgroundColor: "#f5f5f5" },
+  container: { flex: 1, backgroundColor: "#f5f5f5" },
+  content: { flex: 1, paddingHorizontal: 16, paddingTop: 16 },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
   welcome: { fontSize: 18, fontWeight: "600", marginBottom: 12, color: "#333" },
-  debugBox: { marginBottom: 12 },
   empty: { flex: 1, justifyContent: "center", alignItems: "center" },
-  emptyText: { fontSize: 18, color: "#666", marginBottom: 4 },
-  emptySub: { fontSize: 14, color: "#999" },
-  fab: {
-    position: "absolute",
-    bottom: 24,
-    right: 24,
-    backgroundColor: "#007aff",
-    borderRadius: 28,
+  emptyImage: { width: "85%", maxWidth: 360, aspectRatio: 1512 / 1106 },
+  bottomBar: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: 20,
-    paddingVertical: 14,
+    paddingTop: 12,
+    backgroundColor: "#fff",
+    borderTopWidth: 1,
+    borderTopColor: "#e0e0e0",
+  },
+  bottomSlot: {
+    flex: 1,
+    paddingVertical: 8,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  bottomSlotRight: { alignItems: "flex-end" },
+  bottomSlotText: { color: "#2A9D8F", fontSize: 15, fontWeight: "600" },
+  addButton: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: "#2A9D8F",
+    alignItems: "center",
+    justifyContent: "center",
     shadowColor: "#000",
     shadowOpacity: 0.2,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
     elevation: 4,
   },
-  fabText: { color: "#fff", fontWeight: "700", fontSize: 16 },
-  logoutText: { color: "#007aff", fontSize: 16, marginRight: 12 },
+  addButtonText: {
+    color: "#fff",
+    fontSize: 32,
+    fontWeight: "300",
+    lineHeight: 34,
+    marginTop: -2,
+  },
 });

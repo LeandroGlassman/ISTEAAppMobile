@@ -45,7 +45,7 @@ export default function LoginScreen({ navigation }: Props) {
         secureTextEntry
       />
 
-      <Button title={submitting ? "Ingresando..." : "Ingresar"} onPress={handleLogin} disabled={submitting} />
+      <Button title={submitting ? "Ingresando..." : "Ingresar"} onPress={handleLogin} disabled={submitting} color="#2A9D8F" />
 
       <TouchableOpacity onPress={() => navigation.navigate("Register")} style={styles.linkContainer}>
         <Text style={styles.link}>¿No tenés cuenta? Registrate</Text>
@@ -66,5 +66,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   linkContainer: { marginTop: 16, alignItems: "center" },
-  link: { color: "#007aff", fontSize: 14 },
+  link: { color: "#2A9D8F", fontSize: 14 },
 });

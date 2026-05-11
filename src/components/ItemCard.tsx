@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { Animated, Text, TouchableOpacity, View, StyleSheet } from "react-native";
-import { Task } from "../hooks/useItems";
+import { Task } from "../context/TasksContext";
 
 interface Props {
   task: Task;
@@ -75,19 +75,19 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderWidth: 2,
-    borderColor: "#007aff",
+    borderColor: "#2A9D8F",
     borderRadius: 6,
     marginRight: 12,
     justifyContent: "center",
     alignItems: "center",
   },
-  checkboxDone: { backgroundColor: "#007aff" },
+  checkboxDone: { backgroundColor: "#2A9D8F" },
   check: { color: "#fff", fontWeight: "bold" },
   textContainer: { flex: 1 },
   title: { fontSize: 16, fontWeight: "600", color: "#222" },
   titleDone: { textDecorationLine: "line-through", color: "#999" },
   notes: { fontSize: 13, color: "#666", marginTop: 2 },
-  reminder: { fontSize: 12, color: "#007aff", marginTop: 4 },
+  reminder: { fontSize: 12, color: "#2A9D8F", marginTop: 4 },
   deleteBtn: {
     width: 32,
     height: 32,

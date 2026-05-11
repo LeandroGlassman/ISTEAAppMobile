@@ -1,4 +1,11 @@
-import { useState, useEffect, useCallback } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  ReactNode,
+} from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export interface Task {
@@ -11,33 +18,41 @@ export interface Task {
   createdAt: number;
 }
 
-const STORAGE_KEY = "@tasks_list";
+interface TasksContextValue {
+  tasks: Task[];
+  loading: boolean;
+  addTask: (
+    data: Omit<Task, "id" | "completed" | "createdAt">
+  ) => Promise<Task>;
+  toggleTask: (id: string) => Promise<void>;
+  deleteTask: (id: string) => Promise<void>;
+}
 
-export function useItems() {
+const STORAGE_KEY = "@tasks_list";
+const TasksContext = createContext<TasksContextValue | null>(null);
+
+export function TasksProvider({ children }: { children: ReactNode }) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadTasks();
+    (async () => {
+      try {
+        const stored = await AsyncStorage.getItem(STORAGE_KEY);
+        if (stored) setTasks(JSON.parse(stored));
+      } catch (e) {
+        console.error("[Tasks] load error:", e);
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, []);
-
-  const loadTasks = async () => {
-    try {
-      setLoading(true);
-      const stored = await AsyncStorage.getItem(STORAGE_KEY);
-      if (stored) setTasks(JSON.parse(stored));
-    } catch (e) {
-      console.error("[useItems] getItem error:", e);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const persist = async (updated: Task[]) => {
     try {
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
     } catch (e) {
-      console.error("[useItems] setItem error:", e);
+      console.error("[Tasks] persist error:", e);
     }
   };
 
@@ -59,7 +74,7 @@ export function useItems() {
 
   const toggleTask = useCallback(
     async (id: string) => {
-      const updated = tasks.map(t =>
+      const updated = tasks.map((t) =>
         t.id === id ? { ...t, completed: !t.completed } : t
       );
       setTasks(updated);
@@ -70,12 +85,24 @@ export function useItems() {
 
   const deleteTask = useCallback(
     async (id: string) => {
-      const updated = tasks.filter(t => t.id !== id);
+      const updated = tasks.filter((t) => t.id !== id);
       setTasks(updated);
       await persist(updated);
     },
     [tasks]
   );
 
-  return { tasks, loading, addTask, toggleTask, deleteTask };
+  return (
+    <TasksContext.Provider
+      value={{ tasks, loading, addTask, toggleTask, deleteTask }}
+    >
+      {children}
+    </TasksContext.Provider>
+  );
+}
+
+export function useTasks() {
+  const ctx = useContext(TasksContext);
+  if (!ctx) throw new Error("useTasks debe usarse dentro de TasksProvider");
+  return ctx;
 }
