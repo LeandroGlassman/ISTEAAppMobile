@@ -26,6 +26,7 @@ export default function PasswordInput({ hidden: hiddenProp, onToggleHidden, ...r
         style={styles.input}
         secureTextEntry={hidden}
         autoCapitalize="none"
+        placeholderTextColor="#999"
       />
       <TouchableOpacity
         onPress={toggle}
@@ -52,6 +53,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 12,
     fontSize: 16,
+    color: "#222",
   },
   toggle: {
     paddingHorizontal: 14,

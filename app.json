@@ -21,13 +21,19 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.leandroglassman.gestortareas"
     },
     "web": {
       "favicon": "./assets/logo.png"
     },
     "plugins": [
       "@react-native-community/datetimepicker"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "202b83db-e8f9-46f7-95bd-97a2577b064d"
+      }
+    }
   }
 }
