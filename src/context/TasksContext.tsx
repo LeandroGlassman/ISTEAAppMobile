@@ -7,6 +7,7 @@ import React, {
   ReactNode,
 } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Notifications from "expo-notifications";
 
 export interface Task {
   id: string;
@@ -85,6 +86,14 @@ export function TasksProvider({ children }: { children: ReactNode }) {
 
   const deleteTask = useCallback(
     async (id: string) => {
+      const target = tasks.find((t) => t.id === id);
+      if (target?.notificationId) {
+        try {
+          await Notifications.cancelScheduledNotificationAsync(target.notificationId);
+        } catch (e) {
+          console.warn("[Tasks] no se pudo cancelar la notificación:", e);
+        }
+      }
       const updated = tasks.filter((t) => t.id !== id);
       setTasks(updated);
       await persist(updated);

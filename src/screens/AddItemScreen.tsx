@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -47,7 +47,11 @@ function formatTime(d: Date): string {
 
 export default function AddItemScreen({ navigation }: Props) {
   const { addTask } = useTasks();
-  const { scheduleNotification } = useNotifications();
+  const { scheduleNotification, requestPermissions } = useNotifications();
+
+  useEffect(() => {
+    requestPermissions();
+  }, []);
 
   const [title, setTitle] = useState("");
   const [notes, setNotes] = useState("");

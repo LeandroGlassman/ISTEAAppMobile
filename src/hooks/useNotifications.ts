@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import * as Notifications from "expo-notifications";
 import * as Device from "expo-device";
 import { Platform } from "react-native";
@@ -14,10 +13,6 @@ Notifications.setNotificationHandler({
 });
 
 export function useNotifications() {
-  useEffect(() => {
-    requestPermissions();
-  }, []);
-
   const requestPermissions = async () => {
     if (!Device.isDevice) {
       console.warn("[Notifications] emulador detectado, las notificaciones pueden no funcionar bien");

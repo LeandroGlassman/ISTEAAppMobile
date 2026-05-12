@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity } from "react-native";
 import { useAuth } from "../context/AuthContext";
+import PasswordInput from "../components/PasswordInput";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../navigation/AppNavigator";
 
@@ -37,12 +38,10 @@ export default function LoginScreen({ navigation }: Props) {
         autoCapitalize="none"
       />
 
-      <TextInput
-        style={styles.input}
+      <PasswordInput
         placeholder="Contraseña"
         value={password}
         onChangeText={setPassword}
-        secureTextEntry
       />
 
       <Button title={submitting ? "Ingresando..." : "Ingresar"} onPress={handleLogin} disabled={submitting} color="#2A9D8F" />
