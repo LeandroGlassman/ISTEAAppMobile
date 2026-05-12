@@ -33,6 +33,7 @@ export default function LoginScreen({ navigation }: Props) {
       <TextInput
         style={styles.input}
         placeholder="Usuario"
+        placeholderTextColor="#999"
         value={username}
         onChangeText={setUsername}
         autoCapitalize="none"
@@ -63,6 +64,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     borderRadius: 8,
     fontSize: 16,
+    color: "#222",
   },
   linkContainer: { marginTop: 16, alignItems: "center" },
   link: { color: "#2A9D8F", fontSize: 14 },

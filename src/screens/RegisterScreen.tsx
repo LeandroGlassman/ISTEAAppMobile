@@ -40,6 +40,7 @@ export default function RegisterScreen({ navigation }: Props) {
       <TextInput
         style={styles.input}
         placeholder="Usuario"
+        placeholderTextColor="#999"
         value={username}
         onChangeText={setUsername}
         autoCapitalize="none"
@@ -76,5 +77,6 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     borderRadius: 8,
     fontSize: 16,
+    color: "#222",
   },
 });

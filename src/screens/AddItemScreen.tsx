@@ -125,6 +125,7 @@ export default function AddItemScreen({ navigation }: Props) {
         value={title}
         onChangeText={setTitle}
         placeholder="Ej: Comprar leche"
+        placeholderTextColor="#999"
       />
 
       <Text style={styles.label}>Notas (opcional)</Text>
@@ -134,6 +135,7 @@ export default function AddItemScreen({ navigation }: Props) {
         onChangeText={setNotes}
         multiline
         placeholder="Detalle..."
+        placeholderTextColor="#999"
       />
 
       <View style={styles.switchRow}>
@@ -234,6 +236,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
+    color: "#222",
   },
   multiline: { minHeight: 80, textAlignVertical: "top" },
   switchRow: {

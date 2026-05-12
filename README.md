@@ -36,7 +36,7 @@ App móvil para gestión personal de tareas con recordatorios locales, desarroll
 
 Descargar e instalar el APK desde el siguiente link:
 
-https://expo.dev/accounts/leandroglassman/projects/gestor-tareas/builds/eb67b0cc-678a-43a7-8599-47e0d99ab88b
+https://expo.dev/accounts/leandroglassman/projects/gestor-tareas/builds/e1306821-4612-482f-99c2-5913373f0d5b
 
 En el dispositivo Android, puede ser necesario habilitar la opción ***Instalar apps de fuentes desconocidas*** al abrir el archivo.
 
